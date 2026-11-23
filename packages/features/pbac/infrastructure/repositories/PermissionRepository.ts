@@ -68,6 +68,8 @@ export class PermissionRepository implements IPermissionRepository {
       where: {
         userId,
         teamId,
+        // Pending invites must not grant permissions
+        accepted: true,
       },
       select: {
         id: true,
@@ -88,6 +90,8 @@ export class PermissionRepository implements IPermissionRepository {
       where: {
         userId,
         teamId: orgId,
+        // Pending invites must not grant permissions
+        accepted: true,
       },
       select: {
         id: true,

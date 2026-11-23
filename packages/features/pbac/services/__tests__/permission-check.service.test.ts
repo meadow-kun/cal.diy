@@ -126,6 +126,33 @@ describe("PermissionCheckService", () => {
       expect(mockRepository.checkRolePermission).not.toHaveBeenCalled();
     });
 
+    it("should return false for a pending (unaccepted) membership even with an admin role when PBAC disabled", async () => {
+      const pendingMembership = {
+        id: 1,
+        teamId: 1,
+        userId: 1,
+        accepted: false,
+        role: "ADMIN" as MembershipRole,
+        customRoleId: "admin_role",
+        disableImpersonation: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      mockMembershipRepository.findUniqueByUserIdAndTeamId.mockResolvedValueOnce(pendingMembership);
+      mockFeaturesRepository.checkIfTeamHasFeature.mockResolvedValueOnce(false);
+      mockRepository.getTeamById.mockResolvedValueOnce(null);
+
+      const result = await service.checkPermission({
+        userId: 1,
+        teamId: 1,
+        permission: "eventType.create",
+        fallbackRoles: ["ADMIN", "OWNER"],
+      });
+
+      expect(result).toBe(false);
+    });
+
     it("should return false if no team or org membership found when PBAC disabled", async () => {
       mockFeaturesRepository.checkIfTeamHasFeature.mockResolvedValueOnce(false);
       mockMembershipRepository.findUniqueByUserIdAndTeamId.mockResolvedValue(null);

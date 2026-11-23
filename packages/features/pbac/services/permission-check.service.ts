@@ -127,7 +127,9 @@ export class PermissionCheckService {
         teamId,
       });
 
-      let effectiveRole: MembershipRole | null = membership?.role ?? null;
+      // Pending invites must not grant permissions
+      let effectiveRole: MembershipRole | null =
+        membership && membership.accepted !== false ? membership.role : null;
 
       // Check if team has parent org and get org membership
       const team = await this.repository.getTeamById(teamId);
@@ -138,7 +140,7 @@ export class PermissionCheckService {
         });
 
         // Use the highest role between team and org
-        if (orgMembership) {
+        if (orgMembership && orgMembership.accepted !== false) {
           effectiveRole = this.getHighestRole(effectiveRole, orgMembership.role);
         }
       }
@@ -191,7 +193,9 @@ export class PermissionCheckService {
         teamId,
       });
 
-      let effectiveRole: MembershipRole | null = membership?.role ?? null;
+      // Pending invites must not grant permissions
+      let effectiveRole: MembershipRole | null =
+        membership && membership.accepted !== false ? membership.role : null;
 
       // Check if team has parent org and get org membership
       const team = await this.repository.getTeamById(teamId);
@@ -202,7 +206,7 @@ export class PermissionCheckService {
         });
 
         // Use the highest role between team and org
-        if (orgMembership) {
+        if (orgMembership && orgMembership.accepted !== false) {
           effectiveRole = this.getHighestRole(effectiveRole, orgMembership.role);
         }
       }
